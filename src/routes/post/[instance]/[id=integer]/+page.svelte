@@ -303,6 +303,26 @@ flex-wrap gap-4 sticky top-20 w-full box-border z-20 mt-4"
     </div>
   </div>
   {#if $profile?.user}
+{#if post.post_view.post.locked || post.post_view.banned_from_community}
+      <Material
+        elevation="medium"
+        padding="none"
+        color="distinct"
+        class="py-2 px-4 text-sm flex sm:flex-row items-center
+        sm:gap-4 top-20 w-full box-border z-20 mt-4 gap-2"
+      >
+        <Icon src={InformationCircle} mini size="20" />
+        <div>
+          <p class="font-medium">
+            {"You cannot participate in this discussion."}
+          </p>
+          <p class="text-slate-600 dark:text-zinc-400">
+            {post.post_view.post.locked? $t('comment.locked')
+              : $t('You have been banned from this community.') }
+          </p>
+        </div>
+      </Material>
+    {:else }
     <CommentForm
       postId={post.post_view.post.id}
       on:comment={(comment) =>
@@ -318,6 +338,7 @@ flex-wrap gap-4 sticky top-20 w-full box-border z-20 mt-4"
       placeholder={commenting ? undefined : $t('routes.post.addComment')}
       rows={commenting ? 7 : 1}
     />
+{/if}
   {/if}
   <Comments
     post={post.post_view.post}
