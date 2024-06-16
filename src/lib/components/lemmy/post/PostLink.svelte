@@ -3,6 +3,7 @@
   import { Material } from 'mono-svelte'
   import { Icon, Link as LinkIcon } from 'svelte-hero-icons'
   import { optimizeImageURL } from './helpers'
+  import { userSettings } from '$lib/settings';
 
   export let url: string
   export let thumbnail_url: string | undefined = undefined
@@ -42,7 +43,7 @@
         </p>
       {/if}
     </div>
-    {#if thumbnail_url}
+    {#if thumbnail_url && (!$userSettings.leftAlign || $userSettings.view != 'list')}
       <a
         href={url}
         target="_blank"

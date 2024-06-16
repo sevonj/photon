@@ -80,7 +80,7 @@
 'media meta'
 'media title'
 'media body'
-'embed embed'
+'media embed'
 'actions actions'; --template-columns: auto 1fr;`
     : ``}
 >
