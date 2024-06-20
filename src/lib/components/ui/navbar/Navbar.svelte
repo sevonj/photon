@@ -35,9 +35,10 @@
   import SearchBar from '$lib/components/lemmy/util/SearchBar.svelte'
   import { swipeGesture } from '$lib/input/swipe'
   import Logo from '../Logo.svelte'
-  import { LINKED_INSTANCE_URL } from '$lib/instance'
+  import { LINKED_INSTANCE_URL, instance } from '$lib/instance'
   import SiteCard from '$lib/components/lemmy/SiteCard.svelte'
   import { t } from '$lib/translations'
+  import { userSettings } from '$lib/settings.js'
 
   let searching = false
 </script>
@@ -49,24 +50,68 @@
   "
   style={$$props.style}
 >
-  <NavButton href="/" label={$t('nav.home')} class="ml-2 logo">
-    <svelte:fragment slot="icon">
-      {#if LINKED_INSTANCE_URL}
-        {#if $site}
-          <Avatar
-            alt={$site.site_view.site.name}
-            url={$site.site_view.site.icon}
-            width={32}
-            circle={false}
-          />
+  <a
+      href="/"
+      class="flex flex-row items-center gap-2 logo group"
+      title="Home"
+    >
+    <!-- TODO: Remove button -->
+    <NavButton href="/" label={$t('nav.home')} class="ml-2 logo">
+      <svelte:fragment slot="icon">
+        {#if LINKED_INSTANCE_URL || false}
+          {#if $site}
+            <Avatar
+              alt={$site.site_view.site.name}
+              url={$site.site_view.site.icon}
+              width={32}
+              circle={false}
+            />
+          {:else}
+            <Spinner width={32} />
+          {/if}
         {:else}
-          <Spinner width={32} />
+          <Logo width={32} />
         {/if}
-      {:else}
-        <Logo width={32} />
-      {/if}
-    </svelte:fragment>
-  </NavButton>
+      </svelte:fragment>
+    </NavButton>
+    
+    {#if $userSettings.dock.noGap != false}
+      <span class="flex flex-row items-center gap-2 max-[800px]:hidden">
+        <!-- Large site Title -->
+        {#if LINKED_INSTANCE_URL || false}
+          <span
+            class="text-2xl font-black text-slate-800 dark:text-zinc-200 overflow-hidden overflow-ellipsis whitespace-nowrap"
+            style="max-width: 24ch; letter-spacing: -1px;"
+          >
+            {$site?.site_view.site.name}
+          </span>
+
+        <!-- Smol site title + url -->
+        {:else}
+          <span class="opacity-30 text-xl">/</span>
+          <span class="grid place-items-start">
+              <span
+                in:fly={{ y: -12 }}
+                out:fly={{ y: 12 }}
+                style="grid-row: 1; max-width: 24ch;"
+                class="text-base font-bold break-words overflow-hidden overflow-ellipsis whitespace-nowrap"
+              >
+                {$site?.site_view.site.name}
+              </span>
+              <span
+                in:fly={{ y: -12 }}
+                out:fly={{ y: 12 }}
+                style="grid-row: 2; max-width: 24ch;"
+                class="text-xs break-words overflow-hidden overflow-ellipsis whitespace-nowrap text-slate-600 dark:text-zinc-400"
+              >
+                {$instance}
+              </span>
+          </span>
+        {/if}
+      </span>
+    {/if}
+  </a>
+
   {#if searching}
     <div
       class="w-full h-full absolute z-20 p-2 flex items-center gap-2 bg-white dark:bg-zinc-950
