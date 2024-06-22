@@ -3,6 +3,7 @@
   import { Material } from 'mono-svelte'
   import { Icon, Link as LinkIcon } from 'svelte-hero-icons'
   import { optimizeImageURL } from './helpers'
+  import { userSettings } from '$lib/settings';
 
   export let url: string
   export let thumbnail_url: string | undefined = undefined
@@ -15,7 +16,7 @@
 </script>
 
 {#if embed_title && !compact}
-  <Material color="distinct" class="flex flex-row gap-4">
+  <Material color="distinct" class="flex gap-4 {$userSettings.leftAlign ? "flex-row-reverse justify-end" : "flex-row"}">
     <div class="flex flex-col gap-2">
       {#if richURL}
         <Link
@@ -46,7 +47,7 @@
       <a
         href={url}
         target="_blank"
-        class="ml-auto w-full thumbnail rounded-r-lg overflow-hidden flex-shrink -m-4"
+        class="{$userSettings.leftAlign ? "mr-1 rounded-l-lg" : "ml-auto rounded-r-lg"} w-full thumbnail overflow-hidden flex-shrink -m-4"
       >
         <img
           src={optimizeImageURL(thumbnail_url, 256)}

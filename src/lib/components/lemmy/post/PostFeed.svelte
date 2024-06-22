@@ -75,14 +75,27 @@
   class="flex flex-col list-none {$userSettings.view == 'card'
     ? 'gap-3 md:gap-4'
     : 'divide-y'} divide-slate-200 dark:divide-zinc-800"
-  style={$userSettings.leftAlign
+  style={$userSettings.leftAlign && $userSettings.view == 'list'
+    ? `--template-areas: 
+'meta meta'
+'media title'
+'media body'
+'embed embed'
+'actions actions'; --template-columns: auto 1fr;`
+    : $userSettings.leftAlign
     ? `--template-areas: 
 'media meta'
 'media title'
 'media body'
 'embed embed'
 'actions actions'; --template-columns: auto 1fr;`
-    : ``}
+    : $userSettings.view == 'list' ? `--template-areas: 
+'meta meta'
+'title media'
+'body media'
+'embed embed'
+'actions actions';`
+: ` `}
 >
   {#if posts?.length == 0}
     <div class="h-full grid place-items-center">

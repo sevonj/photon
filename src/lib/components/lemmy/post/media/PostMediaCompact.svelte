@@ -18,7 +18,7 @@
 
 {#if view == "compact" || (view == "list" && !post.embed_title && (post.thumbnail_url || isImage(post.url)))}
   <div
-    class="w-24 sm:w-32 h-24 group/media {$$props.class ?? ''}"
+    class="{$userSettings.view == 'list' ? 'mt-2' : "w-24 sm:w-32 h-24"} group/media {$$props.class ?? ''}"
     style={$$props.style ?? ''}
   >
     <svelte:element
@@ -38,7 +38,8 @@
           loading="lazy"
           class="object-cover overflow-hidden bg-slate-100 dark:bg-zinc-800 rounded-xl h-24 w-24 sm:w-32
           border border-slate-200 dark:border-zinc-800 group-hover/media:border-slate-400
-          group-hover/media:dark:border-zinc-600 transition-colors"
+          group-hover/media:dark:border-zinc-600 transition-colors h-max"
+          style={$userSettings.view == 'list' ? "width: 240px; min-height: 160px; max-height: 200px;" : ''}
           alt={post.name}
         />
         {#if type != 'image'}
