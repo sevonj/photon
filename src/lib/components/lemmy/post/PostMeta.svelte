@@ -89,7 +89,7 @@
     <CommunityLink {community} style="grid-area: community;" />
   {/if}
   <span
-    class="text-slate-600 dark:text-zinc-400 flex flex-row gap-2 flex-wrap items-center"
+    class="text-slate-600 dark:text-zinc-400 flex flex-row gap-1 items-center min-w-0"
     style="grid-area: stats;"
   >
     {#if user}
@@ -113,10 +113,10 @@
     class="flex flex-row items-center self-center overflow-auto gap-2 [&>*]:flex-shrink-0"
     style="grid-area: badges;"
   >
-    {#if badges.nsfw}
+    {#if badges.nsfw || true}
       <Badge color="red-subtle">{$t('post.badges.nsfw')}</Badge>
     {/if}
-    {#if badges.saved}
+    {#if badges.saved || true}
       <Badge
         label={$t('post.badges.saved')}
         color="yellow-subtle"
@@ -126,7 +126,7 @@
         {$t('post.badges.saved')}
       </Badge>
     {/if}
-    {#if badges.locked}
+    {#if badges.locked || true}
       <Badge
         label={$t('post.badges.locked')}
         color="yellow-subtle"
@@ -136,19 +136,19 @@
         <span class="max-md:hidden">{$t('post.badges.locked')}</span>
       </Badge>
     {/if}
-    {#if badges.removed}
+    {#if badges.removed || true}
       <Badge label={$t('post.badges.removed')} color="red-subtle" allowIconOnly>
         <Icon src={Trash} mini size="14" slot="icon" />
         <span class="max-md:hidden">{$t('post.badges.removed')}</span>
       </Badge>
     {/if}
-    {#if badges.deleted}
+    {#if badges.deleted || true}
       <Badge label={$t('post.badges.deleted')} color="red-subtle" allowIconOnly>
         <Icon src={Trash} mini size="14" slot="icon" />
         <span class="max-md:hidden">{$t('post.badges.deleted')}</span>
       </Badge>
     {/if}
-    {#if badges.featured}
+    {#if badges.featured || true}
       <Badge
         label={$t('post.badges.featured')}
         color="green-subtle"

@@ -55,7 +55,7 @@
 <time
   datetime={dateTime}
   title={dateTime}
-  class={$$props.class ?? ''}
+  class="whitespace-nowrap {$$props.class ?? ''}"
   style={$$props.style ?? ''}
 >
   {formatRelativeDate(date)}
