@@ -13,35 +13,36 @@
     ServerStack,
     UserCircle,
     UserGroup,
-  } from 'svelte-hero-icons'
-  import { profile, profileData } from '$lib/auth.js'
-  import { userSettings } from '$lib/settings.js'
-  import SidebarButton from '$lib/components/ui/sidebar/SidebarButton.svelte'
-  import CommunityList from '$lib/components/ui/sidebar/CommunityList.svelte'
-  import ProfileButton from '$lib/components/ui/sidebar/ProfileButton.svelte'
-  import { flip } from 'svelte/animate'
-  import { expoOut } from 'svelte/easing'
-  import { Badge, Button } from 'mono-svelte'
-  import { DEFAULT_INSTANCE_URL, LINKED_INSTANCE_URL } from '$lib/instance.js'
-  import Expandable from '$lib/components/ui/Expandable.svelte'
-  import EndPlaceholder from '../EndPlaceholder.svelte'
-  import Application from '../../../../routes/admin/applications/Application.svelte'
-  import { t } from '$lib/translations'
-  import ItemList from '$lib/components/lemmy/generic/ItemList.svelte'
-  import { iconOfLink } from '../navbar/link'
-  import { goto } from '$app/navigation'
-  import { page } from '$app/stores'
-
+  } from "svelte-hero-icons";
+  import { profile, profileData } from "$lib/auth.js";
+  import { userSettings } from "$lib/settings.js";
+  import SidebarButton from "$lib/components/ui/sidebar/SidebarButton.svelte";
+  import CommunityList from "$lib/components/ui/sidebar/CommunityList.svelte";
+  import ProfileButton from "$lib/components/ui/sidebar/ProfileButton.svelte";
+  import { flip } from "svelte/animate";
+  import { expoOut } from "svelte/easing";
+  import { Badge, Button } from "mono-svelte";
+  import { DEFAULT_INSTANCE_URL, LINKED_INSTANCE_URL } from "$lib/instance.js";
+  import Expandable from "$lib/components/ui/Expandable.svelte";
+  import EndPlaceholder from "../EndPlaceholder.svelte";
+  import Application from "../../../../routes/admin/applications/Application.svelte";
+  import { t } from "$lib/translations";
+  import ItemList from "$lib/components/lemmy/generic/ItemList.svelte";
+  import { iconOfLink } from "../navbar/link";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
+  import Setting from "../../../../routes/settings/Setting.svelte";
+  import MultiSelect from "$lib/components/input/Switch.svelte";
   function pinsEvent(node: HTMLElement) {
     node.oncontextmenu = (e) => {
-      e.preventDefault()
-      console.log('test')
+      e.preventDefault();
+      console.log("test");
       // $userSettings.dock.pins = $userSettings.dock.pins.splice(
       //   $userSettings.dock.pins.findIndex((p) => pin.url == p.url),
       //   1
       // )
-      return false
-    }
+      return false;
+    };
   }
 </script>
 
@@ -60,12 +61,12 @@
           alignment="center"
           selected={`${$page.url.pathname}${$page.url.search}` == pin.url}
           on:contextmenu={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             $userSettings.dock.pins = $userSettings.dock.pins.toSpliced(
               $userSettings.dock.pins.findIndex((p) => pin.url == p.url),
-              1
-            )
-            return false
+              1,
+            );
+            return false;
           }}
           size="square-md"
         ></SidebarButton>
@@ -73,15 +74,25 @@
     </div>
     <hr class="border-slate-200 dark:border-zinc-900 my-1" />
   {/if}
+  <Setting>
+    <MultiSelect
+      options={[true, false]}
+      optionNames={[
+        $t("settings.app.thumbnailSide.left"),
+        $t("settings.app.thumbnailSide.right"),
+      ]}
+      bind:selected={$userSettings.leftAlign}
+    />
+  </Setting>
   {#if $profile?.jwt}
     <SidebarButton icon={UserCircle} href="/profile/user">
       <span slot="label">
-        {$t('profile.profile')}
+        {$t("profile.profile")}
       </span>
     </SidebarButton>
     <SidebarButton icon={Inbox} href="/inbox">
       <span slot="label" class="flex items-center gap-2">
-        {$t('profile.inbox')}
+        {$t("profile.inbox")}
         {#if $profile?.user?.notifications.inbox}
           <Badge
             class="w-5 h-5 !p-0 grid place-items-center ml-auto"
@@ -93,29 +104,29 @@
       </span>
     </SidebarButton>
     <SidebarButton icon={Bookmark} href="/saved">
-      <span slot="label">{$t('profile.saved')}</span>
+      <span slot="label">{$t("profile.saved")}</span>
     </SidebarButton>
   {:else}
     <SidebarButton
       href="/login"
-      title={$t('account.login')}
+      title={$t("account.login")}
       icon={ArrowLeftOnRectangle}
     >
-      <span slot="label">{$t('account.login')}</span>
+      <span slot="label">{$t("account.login")}</span>
     </SidebarButton>
     <SidebarButton
       href="/signup"
-      title={$t('account.signup')}
+      title={$t("account.signup")}
       icon={Identification}
     >
-      <span slot="label">{$t('account.signup')}</span>
+      <span slot="label">{$t("account.signup")}</span>
     </SidebarButton>
     <SidebarButton
       href="/settings"
-      title={$t('nav.menu.settings')}
+      title={$t("nav.menu.settings")}
       icon={Cog6Tooth}
     >
-      <span slot="label">{$t('nav.menu.settings')}</span>
+      <span slot="label">{$t("nav.menu.settings")}</span>
     </SidebarButton>
   {/if}
   {#if $profileData.profiles.length >= 1}
@@ -126,7 +137,7 @@
       </div>
     {/each}
     <SidebarButton href="/accounts" icon={UserGroup}>
-      <span slot="label">{$t('account.accounts')}</span>
+      <span slot="label">{$t("account.accounts")}</span>
     </SidebarButton>
   {/if}
   <hr class="border-slate-200 dark:border-zinc-900 my-1" />
@@ -142,7 +153,7 @@
           : '//max-lg:hidden'}"
       >
         <EndPlaceholder>
-          {$t('routes.profile.favorites')}
+          {$t("routes.profile.favorites")}
           <span slot="action" class="dark:text-white text-black">
             {$profile.favorites.length}
           </span>
@@ -165,7 +176,7 @@
             : '//max-lg:hidden'}"
         >
           <EndPlaceholder>
-            {$t('routes.profile.moderates')}
+            {$t("routes.profile.moderates")}
             <span slot="action" class="dark:text-white text-black">
               {$profile.user.moderates.length}
             </span>
@@ -189,7 +200,7 @@
           : '//max-lg:hidden'}"
       >
         <EndPlaceholder>
-          {$t('profile.subscribed')}
+          {$t("profile.subscribed")}
           <span slot="action" class="dark:text-white text-black">
             {$profile.user.follows.length}
           </span>

@@ -1,40 +1,42 @@
 <script lang="ts">
-  import Post from '$lib/components/lemmy/post/Post.svelte'
-  import Placeholder from '$lib/components/ui/Placeholder.svelte'
-  import { userSettings } from '$lib/settings.js'
-  import type { PostView } from 'lemmy-js-client'
-  import { Badge, Button } from 'mono-svelte'
-  import { ArchiveBox, Icon, Minus, Plus } from 'svelte-hero-icons'
-  import { expoOut } from 'svelte/easing'
-  import { fly, slide } from 'svelte/transition'
+  import Post from "$lib/components/lemmy/post/Post.svelte";
+  import Placeholder from "$lib/components/ui/Placeholder.svelte";
+  import { userSettings } from "$lib/settings.js";
+  import type { PostView } from "lemmy-js-client";
+  import { Badge, Button } from "mono-svelte";
+  import { ArchiveBox, Icon, Minus, Plus } from "svelte-hero-icons";
+  import { expoOut } from "svelte/easing";
+  import { fly, slide } from "svelte/transition";
+  import PostCompact from "./PostCompact.svelte";
+  import PostList from "./PostList.svelte";
 
   type PostViewWithCrossposts = PostView & {
-    withCrossposts: true
-    crossposts: PostView[]
-  }
-  type PostViewWithoutCrossposts = PostView & { withCrossposts?: false }
+    withCrossposts: true;
+    crossposts: PostView[];
+  };
+  type PostViewWithoutCrossposts = PostView & { withCrossposts?: false };
 
-  export let posts: PostView[]
-  export let community: boolean = false
+  export let posts: PostView[];
+  export let community: boolean = false;
 
   const addCrosspostProperty = (
     post: PostView,
-    crossposts: PostView[]
+    crossposts: PostView[],
   ): PostViewWithCrossposts => ({
     ...post,
     crossposts: crossposts,
     withCrossposts: true,
-  })
+  });
 
   const combineCrossposts = (
-    posts: PostView[]
+    posts: PostView[],
   ): (PostViewWithCrossposts | PostViewWithoutCrossposts)[] => {
     const urlMap = new Map<
       string,
       PostViewWithCrossposts | PostViewWithoutCrossposts
-    >()
-    const results: (PostViewWithCrossposts | PostViewWithoutCrossposts)[] = []
-    const seenUrls = new Set<string>()
+    >();
+    const results: (PostViewWithCrossposts | PostViewWithoutCrossposts)[] = [];
+    const seenUrls = new Set<string>();
 
     posts?.forEach((post) => {
       if (
@@ -42,47 +44,39 @@
         ($userSettings.hidePosts.deleted && post.post.deleted) ||
         ($userSettings.hidePosts.removed && post.post.removed)
       )
-        return
+        return;
       if (!post?.post?.url) {
-        results.push(post)
-        return
+        results.push(post);
+        return;
       }
 
-      let existing = urlMap.get(post.post.url)
+      let existing = urlMap.get(post.post.url);
       if (existing) {
-        existing.withCrossposts = true
+        existing.withCrossposts = true;
         if (existing.withCrossposts) {
-          existing.crossposts = [...(existing.crossposts || []), post]
+          existing.crossposts = [...(existing.crossposts || []), post];
         }
 
-        urlMap.set(post.post.url, existing)
+        urlMap.set(post.post.url, existing);
       } else {
-        urlMap.set(post.post.url, post)
-        results.push(post)
+        urlMap.set(post.post.url, post);
+        results.push(post);
       }
-      seenUrls.add(post.post.url)
-    })
+      seenUrls.add(post.post.url);
+    });
 
-    return results
-  }
+    return results;
+  };
 
-  $: combinedPosts = combineCrossposts(posts)
+  $: combinedPosts = combineCrossposts(posts);
 
-  let viewPost: number = -1
+  let viewPost: number = -1;
 </script>
 
 <ul
   class="flex flex-col list-none {$userSettings.view == 'card'
     ? 'gap-3 md:gap-4'
     : 'divide-y'} divide-slate-200 dark:divide-zinc-800"
-  style={$userSettings.leftAlign
-    ? `--template-areas: 
-'media meta'
-'media title'
-'media body'
-'embed embed'
-'actions actions'; --template-columns: auto 1fr;`
-    : ``}
 >
   {#if posts?.length == 0}
     <div class="h-full grid place-items-center">
@@ -109,67 +103,131 @@
           }}
           class="relative"
         >
-          <Post
-            hideCommunity={community}
-            view={(post.post.featured_community || post.post.featured_local) &&
-            $userSettings.posts.compactFeatured
-              ? 'compact'
-              : $userSettings.view}
-            {post}
-            class="transition-all duration-250 {post.withCrossposts &&
-            viewPost != post.post.id
-              ? ''
-              : ''}"
-            on:hide={() => {
-              combinedPosts = combinedPosts.toSpliced(index, 1)
-            }}
-          >
-            <button
-              slot="badges"
-              class:hidden={!post.withCrossposts}
-              on:click={() => {
-                if (viewPost == post.post.id) viewPost = -1
-                else viewPost = post.post.id
+          {#if $userSettings.view == "compact"}
+            <PostCompact
+              hideCommunity={community}
+              view={(post.post.featured_community ||
+                post.post.featured_local) &&
+              $userSettings.posts.compactFeatured
+                ? "compact"
+                : $userSettings.view}
+              {post}
+              class="transition-all duration-250 {post.withCrossposts &&
+              viewPost != post.post.id
+                ? ''
+                : ''}"
+              on:hide={() => {
+                combinedPosts = combinedPosts.toSpliced(index, 1);
+              }}
+            ></PostCompact>
+          {:else if $userSettings.view == "list"}
+            <PostList
+              hideCommunity={community}
+              view={(post.post.featured_community ||
+                post.post.featured_local) &&
+              $userSettings.posts.compactFeatured
+                ? "compact"
+                : $userSettings.view}
+              {post}
+              class="transition-all duration-250 {post.withCrossposts &&
+              viewPost != post.post.id
+                ? ''
+                : ''}"
+              on:hide={() => {
+                combinedPosts = combinedPosts.toSpliced(index, 1);
               }}
             >
-              {#if post.withCrossposts}
-                <Badge
-                  class="z-10 backdrop-blur-xl hover:brightness-110 cursor-pointer transition-all"
-                  color="gray-subtle"
-                >
-                  {#if viewPost == post.post.id}
-                    <Icon mini src={Minus} size="14" />
-                  {:else}
-                    <Icon mini src={Plus} size="14" />
-                  {/if}
-                  {post.crossposts.length} crosspost{post.crossposts.length == 1
-                    ? ''
-                    : 's'}
-                </Badge>
-              {/if}
-            </button>
-          </Post>
-          {#if post.withCrossposts && viewPost == post.post.id}
-            <div
-              transition:slide|global={{
-                axis: 'y',
-                duration: 500,
-                easing: expoOut,
-              }}
-            >
-              <span
-                class="text-sm flex flex-row gap-2 items-center"
-                class:my-4={$userSettings.view == 'card'}
+              <button
+                slot="badges"
+                class:hidden={!post.withCrossposts}
+                on:click={() => {
+                  if (viewPost == post.post.id) viewPost = -1;
+                  else viewPost = post.post.id;
+                }}
               >
-                Crossposts <hr class="w-full dark:border-zinc-800" />
-                {post.crossposts.length}
-              </span>
-              {#each post.crossposts as crosspost, index}
-                <div class="w-full transition-all mb-4">
-                  <Post post={crosspost} view={$userSettings.view} />
-                </div>
-              {/each}
-            </div>
+                {#if post.withCrossposts}
+                  <Badge
+                    class="z-10 backdrop-blur-xl hover:brightness-110 cursor-pointer transition-all"
+                    color="gray-subtle"
+                  >
+                    {#if viewPost == post.post.id}
+                      <Icon mini src={Minus} size="14" />
+                    {:else}
+                      <Icon mini src={Plus} size="14" />
+                    {/if}
+                    {post.crossposts.length} crosspost{post.crossposts.length ==
+                    1
+                      ? ""
+                      : "s"}
+                  </Badge>
+                {/if}
+              </button>
+            </PostList>
+          {:else}
+            <Post
+              hideCommunity={community}
+              view={(post.post.featured_community ||
+                post.post.featured_local) &&
+              $userSettings.posts.compactFeatured
+                ? "compact"
+                : $userSettings.view}
+              {post}
+              class="transition-all duration-250 {post.withCrossposts &&
+              viewPost != post.post.id
+                ? ''
+                : ''}"
+              on:hide={() => {
+                combinedPosts = combinedPosts.toSpliced(index, 1);
+              }}
+            >
+              <button
+                slot="badges"
+                class:hidden={!post.withCrossposts}
+                on:click={() => {
+                  if (viewPost == post.post.id) viewPost = -1;
+                  else viewPost = post.post.id;
+                }}
+              >
+                {#if post.withCrossposts}
+                  <Badge
+                    class="z-10 backdrop-blur-xl hover:brightness-110 cursor-pointer transition-all"
+                    color="gray-subtle"
+                  >
+                    {#if viewPost == post.post.id}
+                      <Icon mini src={Minus} size="14" />
+                    {:else}
+                      <Icon mini src={Plus} size="14" />
+                    {/if}
+                    {post.crossposts.length} crosspost{post.crossposts.length ==
+                    1
+                      ? ""
+                      : "s"}
+                  </Badge>
+                {/if}
+              </button>
+            </Post>
+            {#if post.withCrossposts && viewPost == post.post.id}
+              <div
+                transition:slide|global={{
+                  axis: "y",
+                  duration: 500,
+                  easing: expoOut,
+                }}
+              >
+                <span
+                  class="text-sm flex flex-row gap-2 items-center"
+                  class:my-4={$userSettings.view == "card"}
+                >
+                  Crossposts <hr class="w-full dark:border-zinc-800" />
+                  {post.crossposts.length}
+                </span>
+                {#each post.crossposts as crosspost, index}
+                  <div class="w-full transition-all mb-4">
+                    <Post post={crosspost} view={$userSettings.view} />
+                  </div>
+                {/each}
+              </div>
+            {/if}
           {/if}
         </li>
       {/if}
